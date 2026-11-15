@@ -1,0 +1,28 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Instalar dependências (determinístico)
+        run: npm ci
+
+      - name: Build (typecheck + compilação)
+        run: npm run build
+
+      - name: Testes com cobertura (reprova abaixo de 80%)
+        run: npm run test:cov
