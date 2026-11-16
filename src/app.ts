@@ -4,6 +4,7 @@ import { errorHandler, notFoundHandler } from './middlewares/error-handler.middl
 import { requestLogger } from './middlewares/request-logger.middleware';
 import { authRoutes } from './routes/auth.routes';
 import { healthRoutes } from './routes/health.routes';
+import { patientRoutes } from './routes/patient.routes';
 import { userRoutes } from './routes/user.routes';
 
 /**
@@ -21,6 +22,7 @@ export function createApp(container: Container): Express {
   api.use(healthRoutes(container.healthController));
   api.use(authRoutes(container.authController));
   api.use(userRoutes(container.userController, container.authenticate));
+  api.use(patientRoutes(container.patientController, container.authenticate));
   app.use('/api/v1', api); // todas as rotas do contrato vivem sob /api/v1
 
   app.use(notFoundHandler); // nenhuma rota respondeu → 404
