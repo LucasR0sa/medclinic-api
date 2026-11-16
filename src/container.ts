@@ -5,11 +5,13 @@ import { DoctorController } from './controllers/doctor.controller';
 import { HealthController } from './controllers/health.controller';
 import { PatientController } from './controllers/patient.controller';
 import { UserController } from './controllers/user.controller';
+import { WorkScheduleController } from './controllers/work-schedule.controller';
 import { Patient } from './entities/patient.entity';
 import { User } from './entities/user.entity';
 import { TypeOrmDoctorRepository } from './repositories/typeorm-doctor.repository';
 import { TypeOrmPatientRepository } from './repositories/typeorm-patient.repository';
 import { TypeOrmUserRepository } from './repositories/typeorm-user.repository';
+import { TypeOrmWorkScheduleRepository } from './repositories/typeorm-work-schedule.repository';
 import { BcryptPasswordHasher } from './security/bcrypt-password-hasher';
 import { JwtTokenService } from './security/jwt-token-service';
 import { authenticate } from './middlewares/auth.middleware';
@@ -17,6 +19,7 @@ import { AuthService } from './services/auth.service';
 import { DoctorService } from './services/doctor.service';
 import { PatientService } from './services/patient.service';
 import { UserService } from './services/user.service';
+import { WorkScheduleService } from './services/work-schedule.service';
 
 /**
  * Composition root: o ÚNICO lugar que dá `new` nas peças e as encaixa (RP02).
@@ -28,6 +31,7 @@ export function buildContainer(dataSource: DataSource) {
   const userRepository = new TypeOrmUserRepository(dataSource.getRepository(User));
   const patientRepository = new TypeOrmPatientRepository(dataSource.getRepository(Patient));
   const doctorRepository = new TypeOrmDoctorRepository(dataSource);
+  const workScheduleRepository = new TypeOrmWorkScheduleRepository(dataSource);
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService(env.JWT_SECRET, env.JWT_EXPIRES_IN);
 
@@ -36,6 +40,7 @@ export function buildContainer(dataSource: DataSource) {
   const userService = new UserService(userRepository, passwordHasher);
   const patientService = new PatientService(patientRepository);
   const doctorService = new DoctorService(userRepository, doctorRepository, passwordHasher);
+  const workScheduleService = new WorkScheduleService(doctorRepository, workScheduleRepository);
 
   return {
     authenticate: authenticate(tokenService),
@@ -44,6 +49,7 @@ export function buildContainer(dataSource: DataSource) {
     userController: new UserController(userService),
     patientController: new PatientController(patientService),
     doctorController: new DoctorController(doctorService),
+    workScheduleController: new WorkScheduleController(workScheduleService),
   };
 }
 

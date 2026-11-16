@@ -7,6 +7,7 @@ import { doctorRoutes } from './routes/doctor.routes';
 import { healthRoutes } from './routes/health.routes';
 import { patientRoutes } from './routes/patient.routes';
 import { userRoutes } from './routes/user.routes';
+import { workScheduleRoutes } from './routes/work-schedule.routes';
 
 /**
  * Monta o Express. A ORDEM dos app.use é a ordem em que a requisição
@@ -25,6 +26,7 @@ export function createApp(container: Container): Express {
   api.use(userRoutes(container.userController, container.authenticate));
   api.use(patientRoutes(container.patientController, container.authenticate));
   api.use(doctorRoutes(container.doctorController, container.authenticate));
+  api.use(workScheduleRoutes(container.workScheduleController, container.authenticate));
   app.use('/api/v1', api); // todas as rotas do contrato vivem sob /api/v1
 
   app.use(notFoundHandler); // nenhuma rota respondeu → 404
