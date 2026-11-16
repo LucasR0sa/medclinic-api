@@ -1,17 +1,20 @@
 import type { DataSource } from 'typeorm';
 import { env } from './config/env';
 import { AuthController } from './controllers/auth.controller';
+import { DoctorController } from './controllers/doctor.controller';
 import { HealthController } from './controllers/health.controller';
 import { PatientController } from './controllers/patient.controller';
 import { UserController } from './controllers/user.controller';
 import { Patient } from './entities/patient.entity';
 import { User } from './entities/user.entity';
+import { TypeOrmDoctorRepository } from './repositories/typeorm-doctor.repository';
 import { TypeOrmPatientRepository } from './repositories/typeorm-patient.repository';
 import { TypeOrmUserRepository } from './repositories/typeorm-user.repository';
 import { BcryptPasswordHasher } from './security/bcrypt-password-hasher';
 import { JwtTokenService } from './security/jwt-token-service';
 import { authenticate } from './middlewares/auth.middleware';
 import { AuthService } from './services/auth.service';
+import { DoctorService } from './services/doctor.service';
 import { PatientService } from './services/patient.service';
 import { UserService } from './services/user.service';
 
@@ -24,6 +27,7 @@ export function buildContainer(dataSource: DataSource) {
   // Infraestrutura (implementações das portas)
   const userRepository = new TypeOrmUserRepository(dataSource.getRepository(User));
   const patientRepository = new TypeOrmPatientRepository(dataSource.getRepository(Patient));
+  const doctorRepository = new TypeOrmDoctorRepository(dataSource);
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService(env.JWT_SECRET, env.JWT_EXPIRES_IN);
 
@@ -31,6 +35,7 @@ export function buildContainer(dataSource: DataSource) {
   const authService = new AuthService(userRepository, passwordHasher, tokenService);
   const userService = new UserService(userRepository, passwordHasher);
   const patientService = new PatientService(patientRepository);
+  const doctorService = new DoctorService(userRepository, doctorRepository, passwordHasher);
 
   return {
     authenticate: authenticate(tokenService),
@@ -38,6 +43,7 @@ export function buildContainer(dataSource: DataSource) {
     authController: new AuthController(authService),
     userController: new UserController(userService),
     patientController: new PatientController(patientService),
+    doctorController: new DoctorController(doctorService),
   };
 }
 
