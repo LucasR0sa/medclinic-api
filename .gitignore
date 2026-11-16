@@ -1,5 +1,9 @@
 node_modules/
 dist/
 coverage/
-.env
 *.log
+
+# Segredos: qualquer .env fica fora do Git, exceto o modelo
+.env
+.env.*
+!.env.example
