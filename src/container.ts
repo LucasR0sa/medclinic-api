@@ -1,5 +1,6 @@
 import type { DataSource } from 'typeorm';
 import { env } from './config/env';
+import { AppointmentController } from './controllers/appointment.controller';
 import { AuthController } from './controllers/auth.controller';
 import { DoctorController } from './controllers/doctor.controller';
 import { HealthController } from './controllers/health.controller';
@@ -8,6 +9,7 @@ import { UserController } from './controllers/user.controller';
 import { WorkScheduleController } from './controllers/work-schedule.controller';
 import { Patient } from './entities/patient.entity';
 import { User } from './entities/user.entity';
+import { TypeOrmAppointmentRepository } from './repositories/typeorm-appointment.repository';
 import { TypeOrmDoctorRepository } from './repositories/typeorm-doctor.repository';
 import { TypeOrmPatientRepository } from './repositories/typeorm-patient.repository';
 import { TypeOrmUserRepository } from './repositories/typeorm-user.repository';
@@ -15,7 +17,9 @@ import { TypeOrmWorkScheduleRepository } from './repositories/typeorm-work-sched
 import { BcryptPasswordHasher } from './security/bcrypt-password-hasher';
 import { JwtTokenService } from './security/jwt-token-service';
 import { authenticate } from './middlewares/auth.middleware';
+import { AppointmentService } from './services/appointment.service';
 import { AuthService } from './services/auth.service';
+import { CalendarService } from './services/calendar.service';
 import { DoctorService } from './services/doctor.service';
 import { PatientService } from './services/patient.service';
 import { UserService } from './services/user.service';
@@ -32,6 +36,7 @@ export function buildContainer(dataSource: DataSource) {
   const patientRepository = new TypeOrmPatientRepository(dataSource.getRepository(Patient));
   const doctorRepository = new TypeOrmDoctorRepository(dataSource);
   const workScheduleRepository = new TypeOrmWorkScheduleRepository(dataSource);
+  const appointmentRepository = new TypeOrmAppointmentRepository(dataSource);
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService(env.JWT_SECRET, env.JWT_EXPIRES_IN);
 
@@ -41,6 +46,17 @@ export function buildContainer(dataSource: DataSource) {
   const patientService = new PatientService(patientRepository);
   const doctorService = new DoctorService(userRepository, doctorRepository, passwordHasher);
   const workScheduleService = new WorkScheduleService(doctorRepository, workScheduleRepository);
+  const appointmentService = new AppointmentService(
+    doctorRepository,
+    patientRepository,
+    workScheduleRepository,
+    appointmentRepository,
+  );
+  const calendarService = new CalendarService(
+    doctorRepository,
+    workScheduleRepository,
+    appointmentRepository,
+  );
 
   return {
     authenticate: authenticate(tokenService),
@@ -50,6 +66,7 @@ export function buildContainer(dataSource: DataSource) {
     patientController: new PatientController(patientService),
     doctorController: new DoctorController(doctorService),
     workScheduleController: new WorkScheduleController(workScheduleService),
+    appointmentController: new AppointmentController(appointmentService, calendarService),
   };
 }
 
