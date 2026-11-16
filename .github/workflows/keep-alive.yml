@@ -1,0 +1,22 @@
+name: Keep-alive
+
+# O plano gratuito do Render suspende o serviço após 15 minutos sem
+# requisições, e a primeira resposta depois disso pode levar dezenas de
+# segundos (a RNF10 pede até 5 s). Este agendamento chama o health a cada
+# 5 minutos para manter a API acordada durante a correção.
+# Observação: o GitHub pode atrasar execuções agendadas em horários de pico.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: ping
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chamar o health da API publicada
+        run: curl -fsS --max-time 90 --retry 3 --retry-delay 10 https://medclinic-api-k5m8.onrender.com/api/v1/health
