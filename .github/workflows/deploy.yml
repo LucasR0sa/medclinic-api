@@ -1,0 +1,61 @@
+name: Deploy
+
+# Só roda depois do merge: o merge de um PR gera um push na main.
+# Não há gatilho de pull_request aqui, de propósito.
+on:
+  push:
+    branches: [main]
+
+# Dois merges seguidos não publicam fora de ordem: o segundo espera o primeiro.
+concurrency:
+  group: deploy-producao
+  cancel-in-progress: false
+
+# O GITHUB_TOKEN precisa de permissão para gravar no registro de imagens.
+permissions:
+  contents: read
+  packages: write
+
+env:
+  # O GHCR exige o nome em minúsculas.
+  IMAGE: ghcr.io/lucasr0sa/medclinic-api
+
+jobs:
+  publicar:
+    name: publicar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Preparar o Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login no GHCR (com o token automático do GitHub)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build da imagem e publicação no GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+      - name: Disparar o deploy no Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "::warning::Segredo RENDER_DEPLOY_HOOK_URL ainda não configurado. Imagem publicada, deploy não disparado."
+            exit 0
+          fi
+          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL" > /dev/null
+          echo "Deploy disparado no Render para o commit ${{ github.sha }}."
