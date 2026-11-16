@@ -97,4 +97,13 @@ export class InMemoryAppointmentRepository implements AppointmentRepository, Boo
     appointment.status = to;
     return appointment;
   }
+
+  async hasCareLink(doctorId: number, patientId: number): Promise<boolean> {
+    return this.items.some(
+      (a) =>
+        a.doctorId === doctorId &&
+        a.patientId === patientId &&
+        (a.status === 'in_progress' || a.status === 'done'),
+    );
+  }
 }

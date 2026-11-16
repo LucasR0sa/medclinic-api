@@ -1,5 +1,6 @@
 import {
   And,
+  In,
   LessThan,
   MoreThan,
   MoreThanOrEqual,
@@ -116,5 +117,11 @@ export class TypeOrmAppointmentRepository implements AppointmentRepository {
     const result = await this.repo.update({ id, status: from }, { status: to });
     if (!result.affected) return null;
     return this.repo.findOneBy({ id });
+  }
+
+  hasCareLink(doctorId: number, patientId: number): Promise<boolean> {
+    return this.repo.exists({
+      where: { doctorId, patientId, status: In<AppointmentStatus>(['in_progress', 'done']) },
+    });
   }
 }

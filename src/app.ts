@@ -6,6 +6,7 @@ import { appointmentRoutes } from './routes/appointment.routes';
 import { authRoutes } from './routes/auth.routes';
 import { doctorRoutes } from './routes/doctor.routes';
 import { healthRoutes } from './routes/health.routes';
+import { medicalRecordRoutes } from './routes/medical-record.routes';
 import { patientRoutes } from './routes/patient.routes';
 import { userRoutes } from './routes/user.routes';
 import { workScheduleRoutes } from './routes/work-schedule.routes';
@@ -29,6 +30,7 @@ export function createApp(container: Container): Express {
   api.use(doctorRoutes(container.doctorController, container.authenticate));
   api.use(workScheduleRoutes(container.workScheduleController, container.authenticate));
   api.use(appointmentRoutes(container.appointmentController, container.authenticate));
+  api.use(medicalRecordRoutes(container.medicalRecordController, container.authenticate));
   app.use('/api/v1', api); // todas as rotas do contrato vivem sob /api/v1
 
   app.use(notFoundHandler); // nenhuma rota respondeu → 404
