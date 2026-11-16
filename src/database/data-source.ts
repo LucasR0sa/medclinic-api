@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { env } from '../config/env';
+import { Appointment } from '../entities/appointment.entity';
 import { Doctor } from '../entities/doctor.entity';
 import { Patient } from '../entities/patient.entity';
 import { User } from '../entities/user.entity';
@@ -10,6 +11,7 @@ import { SeedAdmin1794842477041 } from './migrations/1794842477041-seed-admin';
 import { CreatePatients1794842477042 } from './migrations/1794842477042-create-patients';
 import { CreateDoctors1794842477043 } from './migrations/1794842477043-create-doctors';
 import { CreateWorkShifts1794842477044 } from './migrations/1794842477044-create-work-shifts';
+import { CreateAppointments1794842477045 } from './migrations/1794842477045-create-appointments';
 
 /**
  * A "gaveta" do arquivo de fichas: como chegar no banco e o que existe nele.
@@ -23,7 +25,7 @@ export const dataSource = new DataSource({
   password: env.DB_PASSWORD,
   database: env.DB_NAME,
   ssl: env.DB_SSL ? { rejectUnauthorized: true } : false, // RP08
-  entities: [User, Patient, Doctor, WorkShift],
+  entities: [User, Patient, Doctor, WorkShift, Appointment],
   // A ordem do array é a ordem do livro de reformas.
   migrations: [
     CreateUsers1794842477040,
@@ -31,6 +33,7 @@ export const dataSource = new DataSource({
     CreatePatients1794842477042,
     CreateDoctors1794842477043,
     CreateWorkShifts1794842477044,
+    CreateAppointments1794842477045,
   ],
   synchronize: false, // RP06: estrutura só por migration, nunca automática
   logging: false,
