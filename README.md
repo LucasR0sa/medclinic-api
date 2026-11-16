@@ -9,7 +9,7 @@ API REST de uma clínica médica: cadastro de pacientes e médicos, escala de tr
 | **API publicada** | https://medclinic-api-k5m8.onrender.com |
 | **Health** | https://medclinic-api-k5m8.onrender.com/api/v1/health |
 | **Swagger (RA1)** | https://medclinic-api-k5m8.onrender.com/v1/docs |
-| **Board do projeto** | BOARD_URL |
+| **Board do projeto** | https://github.com/users/LucasR0sa/projects/1 |
 
 > O plano gratuito do Render suspende o serviço após 15 minutos sem uso. O workflow `keep-alive.yml` chama o health a cada 5 minutos para mantê-lo acordado. Se ainda assim a primeira resposta demorar, é o serviço voltando sozinho.
 
