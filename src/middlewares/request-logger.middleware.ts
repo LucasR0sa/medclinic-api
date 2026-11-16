@@ -34,6 +34,7 @@ export const requestLogger: RequestHandler = (req, res, next) => {
       path,
       statusCode: res.statusCode,
       durationMs: Math.round(performance.now() - startedAt),
+      userId: req.user?.userId, // RA2: quem chamou, quando autenticado
       error: res.locals.errorCode,
     });
   });

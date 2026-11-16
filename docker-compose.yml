@@ -1,0 +1,22 @@
+# Postgres para desenvolvimento local. Em produção o banco é o Neon.
+# O compose lê o mesmo .env da API, então usuário/senha/banco ficam num lugar só.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: medclinic-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - medclinic-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  medclinic-pgdata:

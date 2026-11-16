@@ -3,8 +3,9 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     include: ['tests/**/*.spec.ts'],
-    // Enquanto não existe nenhum service, a suíte vazia não deve reprovar.
-    passWithNoTests: true,
+    // describe/it/expect/vi entregues pelo próprio executor, sem import:
+    // com import, este projeto CommonJS carregava uma segunda cópia do vitest.
+    globals: true,
     coverage: {
       provider: 'v8',
       // Recorte da cobertura: só os arquivos de regra de negócio (RNF07).
