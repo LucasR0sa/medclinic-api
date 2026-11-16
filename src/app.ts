@@ -2,6 +2,7 @@ import express, { type Express } from 'express';
 import type { Container } from './container';
 import { errorHandler, notFoundHandler } from './middlewares/error-handler.middleware';
 import { requestLogger } from './middlewares/request-logger.middleware';
+import { appointmentRoutes } from './routes/appointment.routes';
 import { authRoutes } from './routes/auth.routes';
 import { doctorRoutes } from './routes/doctor.routes';
 import { healthRoutes } from './routes/health.routes';
@@ -27,6 +28,7 @@ export function createApp(container: Container): Express {
   api.use(patientRoutes(container.patientController, container.authenticate));
   api.use(doctorRoutes(container.doctorController, container.authenticate));
   api.use(workScheduleRoutes(container.workScheduleController, container.authenticate));
+  api.use(appointmentRoutes(container.appointmentController, container.authenticate));
   app.use('/api/v1', api); // todas as rotas do contrato vivem sob /api/v1
 
   app.use(notFoundHandler); // nenhuma rota respondeu → 404
