@@ -53,4 +53,6 @@ export interface AppointmentRepository {
     from: AppointmentStatus,
     to: AppointmentStatus,
   ): Promise<Appointment | null>;
+  /** RN14: existe ao menos uma consulta in_progress ou done entre este médico e este paciente? */
+  hasCareLink(doctorId: number, patientId: number): Promise<boolean>;
 }
