@@ -1,11 +1,13 @@
 // Acrescenta campos nossos aos tipos do Express (declaration merging).
-export {};
+import type { TokenPayload } from '../security/token-service';
 
 declare global {
   namespace Express {
     interface Request {
       /** Identificador único gerado no início da requisição (RA2). */
       requestId: string;
+      /** Quem está chamando, preenchido pelo middleware authenticate. */
+      user?: TokenPayload;
     }
 
     interface Locals {
