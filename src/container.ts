@@ -2,11 +2,14 @@ import type { DataSource } from 'typeorm';
 import { env } from './config/env';
 import { AuthController } from './controllers/auth.controller';
 import { HealthController } from './controllers/health.controller';
+import { UserController } from './controllers/user.controller';
 import { User } from './entities/user.entity';
 import { TypeOrmUserRepository } from './repositories/typeorm-user.repository';
 import { BcryptPasswordHasher } from './security/bcrypt-password-hasher';
 import { JwtTokenService } from './security/jwt-token-service';
+import { authenticate } from './middlewares/auth.middleware';
 import { AuthService } from './services/auth.service';
+import { UserService } from './services/user.service';
 
 /**
  * Composition root: o ÚNICO lugar que dá `new` nas peças e as encaixa (RP02).
@@ -21,11 +24,13 @@ export function buildContainer(dataSource: DataSource) {
 
   // Regras de negócio
   const authService = new AuthService(userRepository, passwordHasher, tokenService);
+  const userService = new UserService(userRepository, passwordHasher);
 
   return {
-    tokenService,
+    authenticate: authenticate(tokenService),
     healthController: new HealthController(),
     authController: new AuthController(authService),
+    userController: new UserController(userService),
   };
 }
 
